@@ -1,0 +1,3 @@
+struct MachineType {
+    name: String
+}
