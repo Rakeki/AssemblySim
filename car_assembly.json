@@ -1,0 +1,48 @@
+{
+  "items": 50,
+  "machines": [
+    { "id": 0, "name": "Stamping Press", "staff_required": 2, "count": 3 },
+    { "id": 1, "name": "Body Welding Cell", "staff_required": 2, "count": 4 },
+    { "id": 2, "name": "Paint Booth", "staff_required": 1, "count": 2 },
+    { "id": 3, "name": "Curing Oven", "is_automated": true, "count": 2 },
+    { "id": 4, "name": "Drivetrain Install", "staff_required": 3, "count": 2 },
+    { "id": 5, "name": "Interior Trim Line", "staff_required": 2, "count": 3 },
+    { "id": 6, "name": "Electrical Harness Station", "staff_required": 2, "count": 2 },
+    { "id": 7, "name": "Final Assembly", "staff_required": 4, "count": 2 },
+    { "id": 8, "name": "Dynamic Test Bench", "staff_required": 2, "count": 2 },
+    { "id": 9, "name": "QC Inspection", "staff_required": 1, "count": 2 }
+  ],
+  "staff": [
+    { "id": 0, "name": "Line Supervisor", "role": { "id": 0, "name": "Generalist", "machine_ids": [] } },
+    { "id": 1, "name": "Press Operator A", "role": { "id": 1, "name": "Press Operator", "machine_ids": [0] } },
+    { "id": 2, "name": "Press Operator B", "role": { "id": 1, "name": "Press Operator", "machine_ids": [0] } },
+    { "id": 3, "name": "Welder A", "role": { "id": 2, "name": "Welder", "machine_ids": [1] } },
+    { "id": 4, "name": "Welder B", "role": { "id": 2, "name": "Welder", "machine_ids": [1] } },
+    { "id": 5, "name": "Painter A", "role": { "id": 3, "name": "Painter", "machine_ids": [2] } },
+    { "id": 6, "name": "Painter B", "role": { "id": 3, "name": "Painter", "machine_ids": [2] } },
+    { "id": 7, "name": "Powertrain Tech A", "role": { "id": 4, "name": "Powertrain Tech", "machine_ids": [4] } },
+    { "id": 8, "name": "Powertrain Tech B", "role": { "id": 4, "name": "Powertrain Tech", "machine_ids": [4] } },
+    { "id": 9, "name": "Interior Tech A", "role": { "id": 5, "name": "Interior Tech", "machine_ids": [5] } },
+    { "id": 10, "name": "Interior Tech B", "role": { "id": 5, "name": "Interior Tech", "machine_ids": [5] } },
+    { "id": 11, "name": "Electrical Tech A", "role": { "id": 6, "name": "Electrical Tech", "machine_ids": [6] } },
+    { "id": 12, "name": "Electrical Tech B", "role": { "id": 6, "name": "Electrical Tech", "machine_ids": [6] } },
+    { "id": 13, "name": "Assembler A", "role": { "id": 7, "name": "Assembler", "machine_ids": [7] } },
+    { "id": 14, "name": "Assembler B", "role": { "id": 7, "name": "Assembler", "machine_ids": [7] } },
+    { "id": 15, "name": "QA Inspector A", "role": { "id": 8, "name": "QA Inspector", "machine_ids": [8, 9] } },
+    { "id": 16, "name": "QA Inspector B", "role": { "id": 8, "name": "QA Inspector", "machine_ids": [8, 9] } },
+    { "id": 17, "name": "Flex Operator A", "role": { "id": 9, "name": "Flex Operator", "machine_ids": [] } },
+    { "id": 18, "name": "Flex Operator B", "role": { "id": 9, "name": "Flex Operator", "machine_ids": [] } }
+  ],
+  "processes": [
+    { "machine_id": 0, "duration": 18 },
+    { "machine_id": 1, "duration": 35 },
+    { "machine_id": 2, "duration": 28 },
+    { "machine_id": 3, "duration": 20 },
+    { "machine_id": 4, "duration": 40 },
+    { "machine_id": 6, "duration": 30 },
+    { "machine_id": 5, "duration": 32 },
+    { "machine_id": 7, "duration": 45 },
+    { "machine_id": 8, "duration": 25 },
+    { "machine_id": 9, "duration": 15 }
+  ]
+}
