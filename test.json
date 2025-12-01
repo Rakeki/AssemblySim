@@ -1,0 +1,20 @@
+{
+  "items": 100,
+  "machines": [
+    { "id": 0, "name": "Dough Station", "staff_required": 1 },
+    { "id": 1, "name": "Oven", "staff_required": 1, "count": 2 },
+    { "id": 2, "name": "Decorator Table", "staff_required": 1, "count": 2 },
+    { "id": 3, "name": "Cooling Rack", "is_automated": true, "count": 10 }
+  ],
+  "staff": [
+    { "id": 0, "name": "User1", "role": { "id": 0, "name": "Floater", "machine_ids": [] } },
+    { "id": 1, "name": "User2", "role": { "id": 0, "name": "Floater", "machine_ids": [] } },
+    { "id": 2, "name": "User3", "role": { "id": 0, "name": "Floater", "machine_ids": [] } }
+  ],
+  "processes": [
+    { "machine_id": 0, "duration": 12 },
+    { "machine_id": 1, "duration": 30 },
+    { "machine_id": 2, "duration": 15 },
+    { "machine_id": 3, "duration": 10 }
+  ]
+}
