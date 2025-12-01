@@ -120,6 +120,7 @@ struct App {
     process_meta: HashMap<u32, (usize, u32)>, // process_id -> (step_index, item_id)
     finished_goods: u32,
     status_tab: usize,
+    process_scroll: usize,
 }
 
 fn run_tui_with_config(config_path: &str, logger: &Logger) -> Result<(), Box<dyn std::error::Error>> {
@@ -145,6 +146,7 @@ fn run_tui_with_config(config_path: &str, logger: &Logger) -> Result<(), Box<dyn
         process_meta: HashMap::new(),
         finished_goods: 0,
         status_tab: 0,
+        process_scroll: 0,
     };
 
     // Seed initial jobs for the first step for all items
@@ -268,6 +270,15 @@ fn run_app(
                     KeyCode::Char(' ') => app.playing = !app.playing,
                     KeyCode::Char('n') => {
                         step_simulation(app);
+                    }
+                    KeyCode::Up => {
+                        app.process_scroll = app.process_scroll.saturating_sub(1);
+                    }
+                    KeyCode::Down => {
+                        let max_scroll = app.steps.len().saturating_sub(1);
+                        if app.process_scroll < max_scroll {
+                            app.process_scroll += 1;
+                        }
                     }
                     KeyCode::Tab => {
                         app.status_tab = (app.status_tab + 1) % 2;
@@ -475,17 +486,31 @@ fn bucket_display_name(app: &App, bucket_id: u32) -> String {
 }
 
 fn draw_process_queues(f: &mut ratatui::Frame, area: Rect, app: &App) {
-    let rows = app.steps.len().max(1) as u16;
-    let constraints: Vec<Constraint> = (0..rows).map(|_| Constraint::Length(5)).collect();
+    if app.steps.is_empty() {
+        let block = Block::default()
+            .borders(Borders::ALL)
+            .title("Process Queues");
+        let para = Paragraph::new(Line::from("No process steps defined"))
+            .block(block)
+            .wrap(Wrap { trim: true });
+        f.render_widget(para, area);
+        return;
+    }
+
+    let card_height: u16 = 5;
+    let visible_slots = std::cmp::max(1, (area.height / card_height) as usize);
+    let max_scroll = app.steps.len().saturating_sub(visible_slots);
+    let start = std::cmp::min(app.process_scroll, max_scroll);
+    let end = std::cmp::min(app.steps.len(), start + visible_slots);
+    let slice = &app.steps[start..end];
+
+    let constraints: Vec<Constraint> = slice.iter().map(|_| Constraint::Length(card_height)).collect();
     let areas = Layout::default()
         .direction(Direction::Vertical)
         .constraints(constraints)
         .split(area);
 
-    for (idx, step) in app.steps.iter().enumerate() {
-        if idx >= areas.len() {
-            break;
-        }
+    for (idx, step) in slice.iter().enumerate() {
         let bucket = step.machine_id;
         let name = bucket_display_name(app, bucket);
         let queue_len = app.job_queues.get(&bucket).map(|q| q.len()).unwrap_or(0);
@@ -511,7 +536,7 @@ fn draw_process_queues(f: &mut ratatui::Frame, area: Rect, app: &App) {
         ];
         let block = Block::default()
             .borders(Borders::ALL)
-            .title(name)
+            .title(format!("{} (step {})", name, start + idx + 1))
             .style(Style::default().fg(Color::White));
         let para = Paragraph::new(text)
             .style(Style::default().fg(Color::White))
@@ -630,6 +655,7 @@ fn draw_metrics(f: &mut ratatui::Frame, area: Rect, app: &App) {
         Line::from("Controls:"),
         Line::from("  space - play/pause"),
         Line::from("  n     - step once"),
+        Line::from("  up/down - scroll process list"),
         Line::from("  tab   - switch status tab"),
         Line::from("  q     - quit"),
     ];
