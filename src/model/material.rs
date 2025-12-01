@@ -1,3 +1,3 @@
-struct Material {
-    name: String
+pub struct Material {
+    pub name: String,
 }

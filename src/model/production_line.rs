@@ -1,6 +1,7 @@
-struct ProductionLine {
-    name: String,
+use super::material::Material;
 
-    startMaterial: Material,
-    endMaterial: Material,
+pub struct ProductionLine {
+    pub name: String,
+    pub start_material: Material,
+    pub end_material: Material,
 }
