@@ -405,4 +405,31 @@ mod tests {
         assert!(!_status_before.is_empty());
         assert!(!_status_after.is_empty());
     }
+
+    #[test]
+    fn finalize_idle_time_releases_stuck_staff() {
+        let mut prod = ProductionSimulator::new();
+        let machine = MachineType::new(0, "Machine A", 1);
+        prod.add_machine(machine);
+
+        let role = Role::new(0, "Operator");
+        let staff = Staff::new(0, "Op", role);
+        prod.add_staff(staff);
+
+        // Start process at time 0
+        assert!(prod.try_start_process(0, 0, 10, 0));
+        // Simulate machine being idle while staff still attached
+        prod.machines[0].is_operating = false;
+        // Finalize after the original duration should free staff and count idle time
+        prod.finalize_idle_time(15);
+
+        assert!(prod.staff[0].is_available);
+        assert_eq!(prod.staff[0].current_machine, None);
+        assert_eq!(prod.machines[0].assigned_staff.len(), 0);
+        assert_eq!(prod.machines[0].idle_time, 15);
+
+        // Advance further to accumulate idle time for staff
+        prod.finalize_idle_time(20);
+        assert_eq!(prod.staff[0].idle_time, 5);
+    }
 }

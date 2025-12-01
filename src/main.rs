@@ -883,3 +883,79 @@ fn run_examples(logger: &Logger) {
         logger.info(&prod.get_status());
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    #[test]
+    fn parse_config_path_supports_flags_and_positionals() {
+        let args = vec![
+            "assemblysim".to_string(),
+            "--config".to_string(),
+            "path/a.json".to_string(),
+        ];
+        assert_eq!(parse_config_path(&args), Some("path/a.json".to_string()));
+
+        let args = vec![
+            "assemblysim".to_string(),
+            "-c".to_string(),
+            "path/b.json".to_string(),
+        ];
+        assert_eq!(parse_config_path(&args), Some("path/b.json".to_string()));
+
+        let args = vec!["assemblysim".to_string(), "path/c.json".to_string()];
+        assert_eq!(parse_config_path(&args), Some("path/c.json".to_string()));
+
+        let args = vec!["assemblysim".to_string()];
+        assert_eq!(parse_config_path(&args), None);
+    }
+
+    #[test]
+    fn load_simulation_from_config_builds_production_state() {
+        let logger = Logger::new(LogLevel::Error);
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!("assemblysim_test_{}.json", timestamp));
+
+        let config = serde_json::json!({
+            "machines": [{
+                "id": 0,
+                "name": "Cutter",
+                "staff_required": 1,
+                "count": 2
+            }],
+            "staff": [{
+                "id": 0,
+                "name": "Alex",
+                "role": {
+                    "id": 0,
+                    "name": "Operator",
+                    "machine_ids": []
+                }
+            }],
+            "processes": [{
+                "machine_id": 0,
+                "process_id": 5,
+                "duration": 12
+            }],
+            "items": 3
+        });
+
+        std::fs::write(&path, serde_json::to_string(&config).unwrap()).unwrap();
+
+        let loaded = load_simulation_from_config(path.to_str().unwrap(), &logger).unwrap();
+        assert_eq!(loaded.production.machines.len(), 2);
+        assert_eq!(loaded.machine_buckets.get(&0).unwrap().len(), 2);
+        assert_eq!(loaded.machine_to_bucket.get(&0), Some(&0));
+        assert_eq!(loaded.machine_to_bucket.get(&1), Some(&0));
+        assert_eq!(loaded.production.staff.len(), 1);
+        assert_eq!(loaded.steps.len(), 1);
+        assert_eq!(loaded.items, 3);
+
+        let _ = std::fs::remove_file(path);
+    }
+}
